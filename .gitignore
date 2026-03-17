@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Logs
+logs/
+*.log
+*.pid
+
+# Config
+config/settings.json
+config/premium_servers.json
+*.conf
+*.key
+
+# Termux
+/data/data/com.termux/
+*.lock
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+
+# Secrets
+*.secret
+*.key
+*.pem
+.env
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Downloads
+downloads/
+*.zip
+*.tar.gz
