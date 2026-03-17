@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Pro - Galaxy A04e</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        .container { width: 100%; max-width: 400px; }
+        .vpn-card {
+            background: white;
+            border-radius: 28px;
+            padding: 24px;
+            box-shadow: 0 30px 50px rgba(0,0,0,0.3);
+        }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .status-circle {
+            width: 150px; height: 150px;
+            margin: 20px auto;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #f5f5f5, #fff);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .status-circle.connected { background: linear-gradient(145deg, #43a047, #2e7d32); color: white; }
+        .connect-btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .server-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        .server-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .server-item.selected { border: 2px solid #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="vpn-card">
+            <div class="header">
+                <h1>🔒 VPN Pro</h1>
+                <p>Samsung Galaxy A04e</p>
+            </div>
+            
+            <div class="status-circle" id="statusCircle">
+                <div class="status-text" id="statusText">غير متصل</div>
+                <div class="ip-address" id="ipAddress">جاري التحميل...</div>
+            </div>
+            
+            <div class="server-list" id="serverList">
+                <div style="text-align: center; padding: 20px;">جاري تحميل السيرفرات...</div>
+            </div>
+            
+            <button class="connect-btn" id="connectBtn" onclick="toggleConnection()" disabled>اتصال</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedServerId = null;
+        let vpnStatus = 'disconnected';
+
+        function loadServers() {
+            fetch('/api/servers')
+                .then(r => r.json())
+                .then(data => displayServers(data.servers))
+                .catch(e => console.error(e));
+        }
+
+        function displayServers(servers) {
+            const list = document.getElementById('serverList');
+            list.innerHTML = '';
+            servers.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'server-item';
+                div.setAttribute('data-id', s.id);
+                div.innerHTML = `<div>${s.name}</div><div style="color: #666;">${s.latency || '--'} ms</div>`;
+                div.onclick = () => selectServer(s.id);
+                list.appendChild(div);
+            });
+        }
+
+        function selectServer(id) {
+            selectedServerId = id;
+            document.querySelectorAll('.server-item').forEach(i => i.classList.remove('selected'));
+            document.querySelector(`[data-id="${id}"]`).classList.add('selected');
+            document.getElementById('connectBtn').disabled = false;
+        }
+
+        function toggleConnection() {
+            if (vpnStatus === 'disconnected') connect();
+            else disconnect();
+        }
+
+        function connect() {
+            fetch('/api/connect', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({server_id: selectedServerId})
+            }).then(r => r.json()).then(() => updateStatus());
+        }
+
+        function disconnect() {
+            fetch('/api/disconnect', {method: 'POST'}).then(() => updateStatus());
+        }
+
+        function updateStatus() {
+            fetch('/api/status').then(r => r.json()).then(data => {
+                vpnStatus = data.status;
+                document.getElementById('statusText').textContent = 
+                    data.status === 'connected' ? '✅ متصل' : '⭕ غير متصل';
+                document.getElementById('ipAddress').textContent = data.ip || 'غير معروف';
+            });
+        }
+
+        loadServers();
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>

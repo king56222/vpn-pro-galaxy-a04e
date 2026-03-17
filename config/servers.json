@@ -1,0 +1,35 @@
+{
+    "servers": [
+        {
+            "id": 1,
+            "name": "🇫🇷 France - OVH",
+            "host": "51.38.48.139",
+            "port": 51820,
+            "country": "France",
+            "flag": "🇫🇷",
+            "latency": 45,
+            "speed": "1Gbps"
+        },
+        {
+            "id": 2,
+            "name": "🇳🇱 Netherlands - DigitalOcean",
+            "host": "46.101.117.163",
+            "port": 51820,
+            "country": "Netherlands",
+            "flag": "🇳🇱",
+            "latency": 52,
+            "speed": "1Gbps"
+        },
+        {
+            "id": 3,
+            "name": "🇩🇪 Germany - Hetzner",
+            "host": "49.12.123.45",
+            "port": 51820,
+            "country": "Germany",
+            "flag": "🇩🇪",
+            "latency": 48,
+            "speed": "1Gbps"
+        }
+    ],
+    "total": 3
+}
